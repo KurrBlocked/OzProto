@@ -122,8 +122,8 @@
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.8\Runtime\Events\Signals\SignalEmitter.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.8\Runtime\Activation\ActivationPlayableAsset.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.8\Runtime\Events\MarkerList.cs" />
-    <Compile Include="Library\PackageCache\com.unity.timeline@1.4.8\Runtime\Playables\TimeControlPlayable.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.8\Runtime\Utilities\TimelineUndo.cs" />
+    <Compile Include="Library\PackageCache\com.unity.timeline@1.4.8\Runtime\Playables\TimeControlPlayable.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.8\Runtime\Playables\ParticleControlPlayable.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.8\Runtime\Utilities\Extrapolation.cs" />
   </ItemGroup>

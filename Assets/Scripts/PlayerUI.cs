@@ -19,7 +19,7 @@ public class PlayerUI : MonoBehaviour
         healthTokens = new GameObject[player.healthCount];
         for (int x = 0; x < player.totalHealth; x++)
         {
-            healthTokens[x] = Instantiate(healthTokenPrefab, new Vector3 (canvas.renderingDisplaySize.x /8  + x * canvas.renderingDisplaySize.x / 23, canvas.renderingDisplaySize.y / 1.1f, 0), Quaternion.identity, transform);
+            healthTokens[x] = Instantiate(healthTokenPrefab, new Vector3 (canvas.renderingDisplaySize.x /11  + x * canvas.renderingDisplaySize.x / 30, canvas.renderingDisplaySize.y / 1.066f, 0), Quaternion.identity, transform);
         }
         
     }

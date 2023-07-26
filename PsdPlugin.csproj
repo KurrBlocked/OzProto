@@ -99,8 +99,8 @@
     <Compile Include="Library\PackageCache\com.unity.2d.psdimporter@4.3.1\Editor\PSDPlugin\PsdFile\Layers\LayerInfo.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.psdimporter@4.3.1\Editor\PSDPlugin\PsdFile\Layers\LayerInfo\InfoLayers.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.psdimporter@4.3.1\Editor\PSDPlugin\PsdFile\Compression\RawImage.cs" />
-    <Compile Include="Library\PackageCache\com.unity.2d.psdimporter@4.3.1\Editor\PSDPlugin\PsdFile\RleWriter.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.psdimporter@4.3.1\Editor\PSDPlugin\PDNWrapper\Size.cs" />
+    <Compile Include="Library\PackageCache\com.unity.2d.psdimporter@4.3.1\Editor\PSDPlugin\PsdFile\RleWriter.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.psdimporter@4.3.1\Editor\PSDPlugin\PsdFile\Compression\ImageDataFactory.cs" />
   </ItemGroup>
   <ItemGroup>

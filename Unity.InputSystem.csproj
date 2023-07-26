@@ -305,8 +305,8 @@
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Plugins\XR\Controls\PoseControl.cs" />
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Plugins\Switch\SwitchSupportHID.cs" />
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Plugins\iOS\iOSStepCounter.cs" />
-    <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Actions\IInputActionCollection.cs" />
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Plugins\WebGL\WebGLSupport.cs" />
+    <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Actions\IInputActionCollection.cs" />
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Devices\Commands\InitiateUserAccountPairingCommand.cs" />
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Editor\Internal\InputStateWindow.cs" />
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Plugins\UI\TrackedDeviceRaycaster.cs" />
@@ -328,8 +328,8 @@
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Utilities\SpriteUtilities.cs" />
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Actions\InputActionPhase.cs" />
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Devices\Pen.cs" />
-    <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Utilities\SavedState.cs" />
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Plugins\Android\AndroidKeyCode.cs" />
+    <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Utilities\SavedState.cs" />
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\State\InputStateBlock.cs" />
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Events\DeviceResetEvent.cs" />
     <Compile Include="Library\PackageCache\com.unity.inputsystem@1.5.1\InputSystem\Events\InputEventBuffer.cs" />

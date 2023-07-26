@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Ground
   - Hazard
+  - Bullet
+  - Enemy
+  - WAF
   layers:
   - Default
   - TransparentFX

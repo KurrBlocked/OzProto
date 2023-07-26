@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -8,20 +9,23 @@ public class PlayerController : MonoBehaviour
     public InputActionReference bounceAction;
     private Vector2 movementInput;
 
-    public float moveSpeed = 5f;
-    public float jumpForce = 10f;
-    public float bounceForce = 50f;
-    public float knockbackForce = 6100f;
-    private bool isBouncing = false;
+    public float moveSpeed = 8f;
+    public float jumpForce = 18f;
+    public float bounceForce = 250f;
+    public float verticalBounceForceOffset = 5f;
+    public float knockbackForce = 20f;
+    public bool isBouncing = false;
     private bool isGrounded = false;
     public bool facingRight = true;
     public int bouncesRemaining = 0;
     public int maxBounces = 4;
     public int totalHealth = 5;
     public int healthCount;
-    public int maxVelocity = 30;
+    public float maxVelocity = 25f;
     private bool isHit;
-
+    private int hitStunTimer = 0;
+    public int hitStunTime = 10;
+    public float bounceDelay = 0.03f;
 
     private Rigidbody2D rb;
     private PhysicsMaterial2D playerPhysicsMaterial;
@@ -103,7 +107,7 @@ public class PlayerController : MonoBehaviour
     private void OnBouncePerformed(InputAction.CallbackContext context)
     {
         isBouncing = !isBouncing;
-        if (bouncesRemaining > 0 && isBouncing)
+        if (bouncesRemaining > 0 && isBouncing && rb.velocity.y != 0f)
         {
 
             rb.AddForce(Vector2.up * jumpForce / 5f, ForceMode2D.Impulse);
@@ -126,20 +130,39 @@ public class PlayerController : MonoBehaviour
 
         if (isHit)
         {
-            healthCount--;
-            isHit = false;
-        }
-        if (!isBouncing)
-        {
-            rb.velocity = new Vector2(moveHorizontal * moveSpeed, rb.velocity.y);
-            if (Mathf.Abs(rb.velocity.y) < 0.0001f && isGrounded)
+            if (hitStunTimer == 0)
             {
-                bouncesRemaining = maxBounces;
+                healthCount--;
+            }
+            hitStunTimer++;
+            if (hitStunTimer == hitStunTime)
+            {
+                isHit = false;
+                hitStunTimer = 0;
             }
         }
+        else
+        {
+            if (!isBouncing)
+            {
+                rb.velocity = new Vector2(moveHorizontal * moveSpeed, rb.velocity.y);
+                if (Mathf.Abs(rb.velocity.y) < 0.0001f && isGrounded)
+                {
+                    bouncesRemaining = maxBounces;
+                }
+            }
+        }
+
         //Curbs large magnitudes
         rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxVelocity);
 
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Bullet" && !isBouncing)
+        {
+            isHit = true;
+        }
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -159,7 +182,7 @@ public class PlayerController : MonoBehaviour
         {
             Vector2 normal = collision.contacts[0].normal;
 
-            if (collision.collider.tag == "Hazard")// Detected Hazard
+            if (collision.collider.tag == "Hazard" && !isHit)// Detected Hazard
             {
                 isHit = true;
                 //rb.velocity = new Vector2 (rb.velocity.x, 0f);
@@ -171,23 +194,28 @@ public class PlayerController : MonoBehaviour
                     cCollider.enabled = true;
                     spriteRenderer.sprite = normalMode;
                 }
-                rb.velocity = new Vector2(rb.velocity.x, calculateKnockbackForce(normal).y * 3.5f); // adds knockback from getting hit
+                rb.velocity = calculateKnockbackForce(normal); // adds knockback from getting hit
             }
             else if (collision.collider.tag == "Enemy")
             {
-                if (isBouncing && bouncesRemaining < 0)
+                if (isBouncing && bouncesRemaining > 0)
                 {
                     bouncesRemaining++;
+                    Bounce(normal, rb.velocity);
                 }
                 else
                 {
-                    healthCount--;
+                    isHit = true;
+                    rb.velocity = calculateKnockbackForce(normal);
                 }
             }
             else if (isBouncing)// Detected WAF and is bouncing
             {
-                rb.AddForce(calculateBounceForce(normal), ForceMode2D.Force);
-                rb.velocity = Vector2.ClampMagnitude(rb.velocity, 100f);
+                Bounce(normal, rb.velocity);
+
+                //rb.velocity = temp;
+                //rb.AddForce(calculateBounceForce(normal), ForceMode2D.Force);
+                //rb.isKinematic = false;
             }
             else// Detected WAF collision from the bottom and isn't bouncing to determined grounded
             {
@@ -202,68 +230,50 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    private void Bounce(Vector2 normal, Vector2 currentVelocity)
+    {
+        rb.velocity = Vector2.zero;
+        rb.isKinematic = true;
+        StartCoroutine(BounceCoroutine(normal, currentVelocity));
+    }
     private Vector2 calculateBounceForce(Vector2 normal)
     {
+        //Checks collision from cardinal directions
         if (normal == new Vector2(0, -1))
         {
             //collision on up
-            //return Vector2.down * bounceForce;
-
-            if (rb.velocity.x > 0)
+            if (rb.velocity.x > 0 || (rb.velocity.x == 0 && facingRight))
             {
-                Debug.Log("right");
-                return new Vector2(Vector2.right.x * bounceForce * 5, Vector2.down.y * bounceForce);
-            }
-            else if (rb.velocity.x < 0)
-            {
-                Debug.Log(rb.velocity.x);
-                Debug.Log("left");
-                return new Vector2(Vector2.left.x * bounceForce * 5, Vector2.down.y * bounceForce);
-            }
-            else if (facingRight)
-            {
-                return new Vector2(Vector2.right.x * bounceForce * 5, Vector2.down.y * bounceForce);
+                return new Vector2(Vector2.right.x * bounceForce, Vector2.down.y * bounceForce / verticalBounceForceOffset);
             }
             else
             {
-                return new Vector2(Vector2.left.x * bounceForce * 5, Vector2.down.y * bounceForce);
+                return new Vector2(Vector2.left.x * bounceForce, Vector2.down.y * bounceForce / verticalBounceForceOffset);
             }
         }
         else if (normal == new Vector2(0, 1))
         {
-            //collision on down
-            //return Vector2.up * bounceForce;
-            if (rb.velocity.x > 0)
+
+            if (rb.velocity.x > 0 || (rb.velocity.x == 0 && facingRight))
             {
-                Debug.Log("right");
-                return new Vector2(Vector2.right.x * bounceForce * 5, Vector2.up.y * bounceForce);
-            }
-            else if (rb.velocity.x < 0)
-            {
-                Debug.Log(rb.velocity.x);
-                Debug.Log("left");
-                return new Vector2(Vector2.left.x * bounceForce * 5, Vector2.up.y * bounceForce);
-            }
-            else if (facingRight)
-            {
-                return new Vector2(Vector2.right.x * bounceForce * 5, Vector2.up.y * bounceForce);
+                return new Vector2(Vector2.right.x * bounceForce, Vector2.up.y * bounceForce / verticalBounceForceOffset);
             }
             else
             {
-                return new Vector2(Vector2.left.x * bounceForce * 5, Vector2.up.y * bounceForce);
+                return new Vector2(Vector2.left.x * bounceForce, Vector2.up.y * bounceForce / verticalBounceForceOffset);
             }
         }
         else if (normal == new Vector2(-1, 0))
         {
             //collision on right
-            return new Vector2(Vector2.left.x * bounceForce * 5, bounceForce * rb.velocity.y);
+            return new Vector2(Vector2.left.x * bounceForce,rb.velocity.y * bounceForce / verticalBounceForceOffset);
         }
         else if (normal == new Vector2(1, 0))
         {
             //collision on left
-            return new Vector2(Vector2.right.x * bounceForce * 5, bounceForce * rb.velocity.y);
+            return new Vector2(Vector2.right.x * bounceForce,rb.velocity.y * bounceForce / verticalBounceForceOffset);
         }
-        else
+        else//Checks collision from diagonal directions
         {
             if (normal.x < 0)
             {
@@ -295,6 +305,95 @@ public class PlayerController : MonoBehaviour
     }
     private Vector2 calculateKnockbackForce(Vector2 normal)
     {
-        return Vector2.up * knockbackForce;
+        if (normal == new Vector2(0, -1))
+        {
+            //collision on up
+            return Vector2.down * knockbackForce;
+        }
+        else if (normal == new Vector2(0, 1))
+        {
+            //collision on down
+            return Vector2.up * knockbackForce;
+        }
+        else if (normal == new Vector2(-1, 0))
+        {
+            //collision on right
+            return Vector2.left * knockbackForce;
+        }
+        else if (normal == new Vector2(1, 0))
+        {
+            //collision on left
+            return Vector2.right * knockbackForce;
+        }
+        else//Checks collision from diagonal directions
+        {
+            if (normal.x < 0)
+            {
+                if (normal.y < 0)
+                {
+                    //collision upper right 
+                    if (normal.x >= -0.6f)
+                    {
+                        return Vector2.left * knockbackForce;
+                    }
+                    else
+                    {
+                        return Vector2.down * knockbackForce;
+                    }
+                }
+                else
+                {
+                    //collision downward right
+                    if (normal.x >= -0.6f)
+                    {
+                        return Vector2.left * knockbackForce;
+                    }
+                    else
+                    {
+                        return Vector2.up * knockbackForce;
+                    }
+                }
+            }
+            else
+            {
+                if (normal.y < 0)
+                {
+                    //collision upper  left
+                    if (normal.x <= 0.6f)
+                    {
+                        return Vector2.right * knockbackForce;
+                    }
+                    else
+                    {
+                        return Vector2.down * knockbackForce;
+                    }
+                }
+                else
+                {
+                    //collision downard left
+                    if (normal.x <= 0.6f)
+                    {
+                        return Vector2.right * knockbackForce;
+                    }
+                    else
+                    {
+                        return Vector2.up * knockbackForce;
+                    }
+                }
+            }
+        }
+    }
+
+    private IEnumerator BounceCoroutine(Vector2 normal, Vector2 savedVelocity)
+    {
+        yield return new WaitForSeconds(bounceDelay);
+        Debug.Log("coroutine");
+        rb.isKinematic = false;
+        rb.velocity = savedVelocity;
+        rb.AddForce(calculateBounceForce(normal), ForceMode2D.Force);
+        
+
+        // Wait for a specified duration before proceeding to the next bounce.
+        
     }
 }
